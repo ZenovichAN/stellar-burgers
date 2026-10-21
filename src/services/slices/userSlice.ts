@@ -5,6 +5,7 @@ import {
   getUserApi,
   loginUserApi,
   registerUserApi,
+  updateUserApi,
   logoutApi
 } from '../../utils/burger-api';
 
@@ -15,19 +16,24 @@ import type {
 
 import { getCookie, setCookie, deleteCookie } from '../../utils/cookie';
 import type { TUser } from '@utils-types';
+import type { RootState } from '../store';
 
 type TUserState = {
   user: TUser | null;
   isAuthChecked: boolean;
   isLoading: boolean;
+  isUpdating: boolean;
   error: string | null;
+  updateUserError: string | null;
 };
 
 const initialState: TUserState = {
   user: null,
   isAuthChecked: false,
   isLoading: false,
-  error: null
+  isUpdating: false,
+  error: null,
+  updateUserError: null
 };
 
 export const checkUserAuth = createAsyncThunk(
@@ -69,15 +75,21 @@ export const registerUser = createAsyncThunk(
   }
 );
 
+export const updateUser = createAsyncThunk(
+  'user/update',
+  async (data: Partial<TRegisterData>) => {
+    const response = await updateUserApi(data);
+    return response.user;
+  }
+);
+
 export const logoutUser = createAsyncThunk(
   'user/logout',
   async () => {
-    try {
-      await logoutApi();
-    } finally {
-      deleteCookie('accessToken');
-      localStorage.removeItem('refreshToken');
-    }
+    await logoutApi();
+
+    deleteCookie('accessToken');
+    localStorage.removeItem('refreshToken');
   }
 );
 
@@ -87,6 +99,7 @@ const userSlice = createSlice({
   reducers: {
     clearUserError: (state) => {
       state.error = null;
+      state.updateUserError = null;
     }
   },
   extraReducers: (builder) => {
@@ -132,28 +145,54 @@ const userSlice = createSlice({
           action.error.message || 'Ошибка регистрации';
       })
 
+      .addCase(updateUser.pending, (state) => {
+        state.isUpdating = true;
+        state.updateUserError = null;
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.user = action.payload;
+        state.isUpdating = false;
+        state.updateUserError = null;
+      })
+      .addCase(updateUser.rejected, (state, action) => {
+        state.isUpdating = false;
+        state.updateUserError =
+          action.error.message || 'Ошибка обновления профиля';
+      })
+
+      .addCase(logoutUser.pending, (state) => {
+        state.error = null;
+      })
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
         state.isAuthChecked = true;
+        state.error = null;
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
+        state.error =
+          action.error.message || 'Ошибка выхода из аккаунта';
       });
   }
 });
 
 export const { clearUserError } = userSlice.actions;
 
-export const selectUser = (state: { user: TUserState }) =>
+export const selectUser = (state: RootState) =>
   state.user.user;
 
-export const selectIsAuthChecked = (
-  state: { user: TUserState }
-) => state.user.isAuthChecked;
+export const selectIsAuthChecked = (state: RootState) =>
+  state.user.isAuthChecked;
 
-export const selectUserLoading = (
-  state: { user: TUserState }
-) => state.user.isLoading;
+export const selectUserLoading = (state: RootState) =>
+  state.user.isLoading;
 
-export const selectUserError = (
-  state: { user: TUserState }
-) => state.user.error;
+export const selectUserError = (state: RootState) =>
+  state.user.error;
+
+export const selectIsUpdatingUser = (state: RootState) =>
+  state.user.isUpdating;
+
+export const selectUpdateUserError = (state: RootState) =>
+  state.user.updateUserError;
 
 export default userSlice.reducer;
