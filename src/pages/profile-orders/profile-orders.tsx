@@ -13,6 +13,7 @@ import {
 
 export const ProfileOrders = (): React.JSX.Element => {
   const dispatch = useDispatch();
+
   const orders = useSelector(selectUserOrders);
   const isLoading = useSelector(selectOrdersLoading);
   const error = useSelector(selectOrdersError);
@@ -20,24 +21,28 @@ export const ProfileOrders = (): React.JSX.Element => {
   useEffect(() => {
     void dispatch(fetchUserOrders());
 
-    const interval = setInterval(() => {
+    const interval = window.setInterval(() => {
       void dispatch(fetchUserOrders());
     }, 15000);
 
-    return () => clearInterval(interval);
+    return () => {
+      window.clearInterval(interval);
+    };
   }, [dispatch]);
 
-  if (isLoading && !orders.length) {
+  if (isLoading && orders.length === 0) {
     return <Preloader />;
   }
 
-  if (error && !orders.length) {
-    return (
-      <p className="text text_type_main-medium mt-10">
-        Не удалось загрузить историю заказов: {error}
-      </p>
-    );
-  }
+  return (
+    <>
+      {error && (
+        <p className="text text_type_main-default text_color_inactive">
+          Ошибка загрузки истории: {error}
+        </p>
+      )}
 
-  return <ProfileOrdersUI orders={orders} />;
+      <ProfileOrdersUI orders={orders} />
+    </>
+  );
 };
