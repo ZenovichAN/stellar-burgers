@@ -33,3 +33,7 @@ test-results
 .env
 .env.local
 .env.*.local
+
+stellar-burgers-review.zip
+
+*.zip

@@ -4,7 +4,7 @@ import {
   FormattedDate,
 } from '@krgaa/react-developer-burger-ui-components';
 import { memo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import type { OrderCardUIProps } from './type';
 
@@ -15,6 +15,8 @@ export const OrderCardUI = memo(function OrderCardUI({
   maxIngredients,
   locationState,
 }: OrderCardUIProps): React.JSX.Element {
+  const location = useLocation();
+
   return (
     <Link
       to={orderInfo.number.toString()}
@@ -30,22 +32,26 @@ export const OrderCardUI = memo(function OrderCardUI({
           <FormattedDate date={orderInfo.date} />
         </span>
       </div>
+
       <h4 className={`pt-6 text text_type_main-medium ${styles.order_name}`}>
         {orderInfo.name}
       </h4>
-      {location.pathname === '/profile/orders' && (
+
+      {location.pathname.startsWith('/profile/orders') && (
         <OrderStatus status={orderInfo.status} />
       )}
+
       <div className={`pt-6 ${styles.order_content}`}>
         <ul className={styles.ingredients}>
           {orderInfo.ingredientsToShow.map((ingredient, index) => {
             const zIndex = maxIngredients - index;
             const right = 20 * index;
+
             return (
               <li
                 className={styles.img_wrap}
-                style={{ zIndex: zIndex, right: right }}
-                key={index}
+                style={{ zIndex, right }}
+                key={`${ingredient._id}-${index}`}
               >
                 <img
                   style={{
@@ -56,15 +62,17 @@ export const OrderCardUI = memo(function OrderCardUI({
                   src={ingredient.image_mobile}
                   alt={ingredient.name}
                 />
-                {maxIngredients === index + 1 ? (
+
+                {maxIngredients === index + 1 && orderInfo.remains > 0 && (
                   <span className={`text text_type_digits-default ${styles.remains}`}>
-                    {orderInfo.remains > 0 ? `+${orderInfo.remains}` : null}
+                    +{orderInfo.remains}
                   </span>
-                ) : null}
+                )}
               </li>
             );
           })}
         </ul>
+
         <div>
           <span className={`text text_type_digits-default pr-1 ${styles.order_total}`}>
             {orderInfo.total}
