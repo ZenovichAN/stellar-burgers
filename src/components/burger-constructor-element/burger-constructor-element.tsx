@@ -1,53 +1,55 @@
-
 import { BurgerConstructorElementUI } from '@ui';
 import { memo } from 'react';
 
-import type { BurgerConstructorElementProps } from './type';
-import { useDispatch } from '../../services/store';
 import {
   removeIngredient,
-  moveIngredient
+  moveIngredient,
 } from '../../services/slices/constructorSlice';
+import { useDispatch } from '../../services/store';
 
-export const BurgerConstructorElement = memo(
-  function BurgerConstructorElement({
-    ingredient,
-    index,
-    totalItems
-  }: BurgerConstructorElementProps): React.JSX.Element {
-    const dispatch = useDispatch();
+import type { BurgerConstructorElementProps } from './type';
 
-    const handleMoveDown = (): void => {
-      if (index < totalItems - 1) {
-        dispatch(moveIngredient({
+export const BurgerConstructorElement = memo(function BurgerConstructorElement({
+  ingredient,
+  index,
+  totalItems,
+}: BurgerConstructorElementProps): React.JSX.Element {
+  const dispatch = useDispatch();
+
+  const handleMoveDown = (): void => {
+    if (index < totalItems - 1) {
+      dispatch(
+        moveIngredient({
           from: index,
-          to: index + 1
-        }));
-      }
-    };
+          to: index + 1,
+        })
+      );
+    }
+  };
 
-    const handleMoveUp = (): void => {
-      if (index > 0) {
-        dispatch(moveIngredient({
+  const handleMoveUp = (): void => {
+    if (index > 0) {
+      dispatch(
+        moveIngredient({
           from: index,
-          to: index - 1
-        }));
-      }
-    };
+          to: index - 1,
+        })
+      );
+    }
+  };
 
-    const handleClose = (): void => {
-      dispatch(removeIngredient(ingredient.id));
-    };
+  const handleClose = (): void => {
+    dispatch(removeIngredient(ingredient.id));
+  };
 
-    return (
-      <BurgerConstructorElementUI
-        ingredient={ingredient}
-        index={index}
-        totalItems={totalItems}
-        handleMoveUp={handleMoveUp}
-        handleMoveDown={handleMoveDown}
-        handleClose={handleClose}
-      />
-    );
-  }
-);
+  return (
+    <BurgerConstructorElementUI
+      ingredient={ingredient}
+      index={index}
+      totalItems={totalItems}
+      handleMoveUp={handleMoveUp}
+      handleMoveDown={handleMoveDown}
+      handleClose={handleClose}
+    />
+  );
+});

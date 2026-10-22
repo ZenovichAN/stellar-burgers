@@ -1,13 +1,11 @@
-
 import { FeedInfoUI } from '@ui';
-import { useSelector } from '../../services/store';
+
 import { selectFeed } from '../../services/slices/feedSlice';
+import { useSelector } from '../../services/store';
+
 import type { TOrder } from '@utils-types';
 
-const getOrders = (
-  orders: TOrder[],
-  status: string
-): number[] =>
+const getOrders = (orders: TOrder[], status: string): number[] =>
   orders
     .filter((item) => item.status === status)
     .map((item) => item.number)

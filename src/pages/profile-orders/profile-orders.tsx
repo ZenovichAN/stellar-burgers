@@ -1,15 +1,16 @@
-
-import { useEffect } from 'react';
-import { ProfileOrdersUI } from '@ui-pages';
 import { Preloader } from '@ui';
+import { ProfileOrdersUI } from '@ui-pages';
+import { useEffect } from 'react';
 
-import { useDispatch, useSelector } from '../../services/store';
 import {
   fetchUserOrders,
   selectUserOrders,
   selectOrdersLoading,
-  selectOrdersError
+  selectOrdersError,
 } from '../../services/slices/ordersSlice';
+import { useDispatch, useSelector } from '../../services/store';
+
+const REFRESH_INTERVAL = 15000;
 
 export const ProfileOrders = (): React.JSX.Element => {
   const dispatch = useDispatch();
@@ -23,9 +24,9 @@ export const ProfileOrders = (): React.JSX.Element => {
 
     const interval = window.setInterval(() => {
       void dispatch(fetchUserOrders());
-    }, 15000);
+    }, REFRESH_INTERVAL);
 
-    return () => {
+    return (): void => {
       window.clearInterval(interval);
     };
   }, [dispatch]);

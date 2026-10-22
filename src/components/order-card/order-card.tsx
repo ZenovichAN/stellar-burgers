@@ -1,17 +1,17 @@
-
 import { OrderCardUI } from '@ui';
 import { memo, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 
+import { selectIngredients } from '../../services/slices/ingredientsSlice';
+import { useSelector } from '../../services/store';
+
 import type { OrderCardProps } from './type';
 import type { TIngredient } from '@utils-types';
-import { useSelector } from '../../services/store';
-import { selectIngredients } from '../../services/slices/ingredientsSlice';
 
 const maxIngredients = 6;
 
 export const OrderCard = memo(function OrderCard({
-  order
+  order,
 }: OrderCardProps): React.JSX.Element | null {
   const location = useLocation();
   const ingredients = useSelector(selectIngredients);
@@ -21,9 +21,7 @@ export const OrderCard = memo(function OrderCard({
 
     const ingredientsInfo = order.ingredients.reduce(
       (acc: TIngredient[], item: string) => {
-        const ingredient = ingredients.find(
-          (ing) => ing._id === item
-        );
+        const ingredient = ingredients.find((ing) => ing._id === item);
 
         if (ingredient) {
           return [...acc, ingredient];
@@ -34,15 +32,9 @@ export const OrderCard = memo(function OrderCard({
       []
     );
 
-    const total = ingredientsInfo.reduce(
-      (acc, item) => acc + item.price,
-      0
-    );
+    const total = ingredientsInfo.reduce((acc, item) => acc + item.price, 0);
 
-    const ingredientsToShow = ingredientsInfo.slice(
-      0,
-      maxIngredients
-    );
+    const ingredientsToShow = ingredientsInfo.slice(0, maxIngredients);
 
     const remains =
       ingredientsInfo.length > maxIngredients
@@ -57,7 +49,7 @@ export const OrderCard = memo(function OrderCard({
       ingredientsToShow,
       remains,
       total,
-      date
+      date,
     };
   }, [order, ingredients]);
 

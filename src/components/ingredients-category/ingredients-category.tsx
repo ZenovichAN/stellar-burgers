@@ -1,16 +1,16 @@
-
 import { IngredientsCategoryUI } from '@ui';
 import { useMemo } from 'react';
 
-import type { TIngredientsCategoryProps } from './type';
-import { useSelector } from '../../services/store';
 import { selectConstructorItems } from '../../services/slices/constructorSlice';
+import { useSelector } from '../../services/store';
+
+import type { TIngredientsCategoryProps } from './type';
 
 export const IngredientsCategory = ({
   title,
   titleRef,
   ingredients,
-  ref
+  ref,
 }: TIngredientsCategoryProps): React.JSX.Element => {
   const burgerConstructor = useSelector(selectConstructorItems);
 

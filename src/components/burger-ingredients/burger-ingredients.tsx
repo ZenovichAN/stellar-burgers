@@ -1,11 +1,11 @@
-
 import { BurgerIngredientsUI } from '@ui';
 import { useMemo, useState, useRef, useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 
-import type { TIngredient, TTabMode } from '@utils-types';
-import { useSelector } from '../../services/store';
 import { selectIngredients } from '../../services/slices/ingredientsSlice';
+import { useSelector } from '../../services/store';
+
+import type { TIngredient, TTabMode } from '@utils-types';
 
 export const BurgerIngredients = (): React.JSX.Element => {
   const [currentTab, setCurrentTab] = useState<TTabMode>('bun');
@@ -15,15 +15,15 @@ export const BurgerIngredients = (): React.JSX.Element => {
   const ingredients = useSelector(selectIngredients);
 
   const [bunsRef, inViewBuns] = useInView({
-    threshold: 0
+    threshold: 0,
   });
 
   const [mainsRef, inViewFilling] = useInView({
-    threshold: 0
+    threshold: 0,
   });
 
   const [saucesRef, inViewSauces] = useInView({
-    threshold: 0
+    threshold: 0,
   });
 
   useEffect(() => {
@@ -41,39 +41,33 @@ export const BurgerIngredients = (): React.JSX.Element => {
 
     if (tab === 'bun') {
       titleBunRef.current?.scrollIntoView({
-        behavior: 'smooth'
+        behavior: 'smooth',
       });
     }
     if (tab === 'main') {
       titleMainRef.current?.scrollIntoView({
-        behavior: 'smooth'
+        behavior: 'smooth',
       });
     }
     if (tab === 'sauce') {
       titleSaucesRef.current?.scrollIntoView({
-        behavior: 'smooth'
+        behavior: 'smooth',
       });
     }
   };
 
   const buns = useMemo(
-    () => ingredients.filter(
-      (item: TIngredient) => item.type === 'bun'
-    ),
+    () => ingredients.filter((item: TIngredient) => item.type === 'bun'),
     [ingredients]
   );
 
   const mains = useMemo(
-    () => ingredients.filter(
-      (item: TIngredient) => item.type === 'main'
-    ),
+    () => ingredients.filter((item: TIngredient) => item.type === 'main'),
     [ingredients]
   );
 
   const sauces = useMemo(
-    () => ingredients.filter(
-      (item: TIngredient) => item.type === 'sauce'
-    ),
+    () => ingredients.filter((item: TIngredient) => item.type === 'sauce'),
     [ingredients]
   );
 

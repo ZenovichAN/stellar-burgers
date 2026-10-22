@@ -1,12 +1,13 @@
-
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+
 import {
   orderBurgerApi,
   getOrdersApi,
-  getOrderByNumberApi
+  getOrderByNumberApi,
 } from '../../utils/burger-api';
-import type { TOrder } from '@utils-types';
+
 import type { RootState } from '../store';
+import type { TOrder } from '@utils-types';
 
 type TOrdersState = {
   orders: TOrder[];
@@ -23,7 +24,7 @@ const initialState: TOrdersState = {
   orderModalData: null,
   orderRequest: false,
   isLoading: false,
-  error: null
+  error: null,
 };
 
 export const createOrder = createAsyncThunk(
@@ -34,16 +35,13 @@ export const createOrder = createAsyncThunk(
   }
 );
 
-export const fetchUserOrders = createAsyncThunk(
-  'orders/fetchUserOrders',
-  getOrdersApi
-);
+export const fetchUserOrders = createAsyncThunk('orders/fetchUserOrders', getOrdersApi);
 
 export const fetchOrderByNumber = createAsyncThunk(
   'orders/fetchOrderByNumber',
   async (number: number) => {
     const response = await getOrderByNumberApi(number);
-    return response.orders[0] || null;
+    return response.orders[0] ?? null;
   }
 );
 
@@ -57,7 +55,7 @@ const ordersSlice = createSlice({
     },
     clearCurrentOrder: (state) => {
       state.currentOrder = null;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -73,8 +71,7 @@ const ordersSlice = createSlice({
       })
       .addCase(createOrder.rejected, (state, action) => {
         state.orderRequest = false;
-        state.error =
-          action.error.message || 'Ошибка создания заказа';
+        state.error = action.error.message ?? 'Ошибка создания заказа';
       })
 
       .addCase(fetchUserOrders.pending, (state) => {
@@ -87,8 +84,7 @@ const ordersSlice = createSlice({
       })
       .addCase(fetchUserOrders.rejected, (state, action) => {
         state.isLoading = false;
-        state.error =
-          action.error.message || 'Ошибка загрузки заказов';
+        state.error = action.error.message ?? 'Ошибка загрузки заказов';
       })
 
       .addCase(fetchOrderByNumber.pending, (state) => {
@@ -101,33 +97,26 @@ const ordersSlice = createSlice({
       })
       .addCase(fetchOrderByNumber.rejected, (state, action) => {
         state.isLoading = false;
-        state.error =
-          action.error.message || 'Ошибка загрузки заказа';
+        state.error = action.error.message ?? 'Ошибка загрузки заказа';
       });
-  }
+  },
 });
 
-export const {
-  clearOrderModal,
-  clearCurrentOrder
-} = ordersSlice.actions;
+export const { clearOrderModal, clearCurrentOrder } = ordersSlice.actions;
 
-export const selectUserOrders = (state: RootState) =>
-  state.orders.orders;
+export const selectUserOrders = (state: RootState): TOrder[] => state.orders.orders;
 
-export const selectOrderModalData = (state: RootState) =>
+export const selectOrderModalData = (state: RootState): TOrder | null =>
   state.orders.orderModalData;
 
-export const selectOrderRequest = (state: RootState) =>
+export const selectOrderRequest = (state: RootState): boolean =>
   state.orders.orderRequest;
 
-export const selectCurrentOrder = (state: RootState) =>
+export const selectCurrentOrder = (state: RootState): TOrder | null =>
   state.orders.currentOrder;
 
-export const selectOrdersLoading = (state: RootState) =>
-  state.orders.isLoading;
+export const selectOrdersLoading = (state: RootState): boolean => state.orders.isLoading;
 
-export const selectOrdersError = (state: RootState) =>
-  state.orders.error;
+export const selectOrdersError = (state: RootState): string | null => state.orders.error;
 
 export default ordersSlice.reducer;

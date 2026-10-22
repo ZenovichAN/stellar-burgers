@@ -1,19 +1,4 @@
-
-import { useEffect } from 'react';
-import {
-  Route,
-  Routes,
-  useLocation,
-  useNavigate
-} from 'react-router-dom';
-
-import {
-  AppHeader,
-  IngredientDetails,
-  Modal,
-  OrderInfo
-} from '@components';
-
+import { AppHeader, IngredientDetails, Modal, OrderInfo } from '@components';
 import {
   ConstructorPage,
   Feed,
@@ -23,27 +8,24 @@ import {
   Profile,
   ProfileOrders,
   Register,
-  ResetPassword
+  ResetPassword,
 } from '@pages';
-
 import { Preloader } from '@ui';
-import { ProtectedRoute } from '../protected-route/protected-route';
-
-import {
-  useDispatch,
-  useSelector
-} from '../../services/store';
+import { useEffect } from 'react';
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 
 import {
   fetchIngredients,
   selectIngredientsLoading,
-  selectIngredientsError
+  selectIngredientsError,
 } from '../../services/slices/ingredientsSlice';
-
 import { checkUserAuth } from '../../services/slices/userSlice';
+import { useDispatch, useSelector } from '../../services/store';
+import { ProtectedRoute } from '../protected-route/protected-route';
+
+import '../../index.css';
 
 import styles from './app.module.css';
-import '../../index.css';
 
 const App = (): React.JSX.Element => {
   const dispatch = useDispatch();
@@ -65,7 +47,7 @@ const App = (): React.JSX.Element => {
   }, [dispatch]);
 
   const closeModal = (): void => {
-    navigate(-1);
+    void navigate(-1);
   };
 
   return (
@@ -80,16 +62,10 @@ const App = (): React.JSX.Element => {
         </p>
       ) : (
         <>
-          <Routes location={background || location}>
-            <Route
-              path="/"
-              element={<ConstructorPage />}
-            />
+          <Routes location={background ?? location}>
+            <Route path="/" element={<ConstructorPage />} />
 
-            <Route
-              path="/feed"
-              element={<Feed />}
-            />
+            <Route path="/feed" element={<Feed />} />
 
             <Route
               path="/login"
@@ -174,10 +150,7 @@ const App = (): React.JSX.Element => {
               }
             />
 
-            <Route
-              path="*"
-              element={<NotFound404 />}
-            />
+            <Route path="*" element={<NotFound404 />} />
           </Routes>
 
           {background && (
@@ -185,10 +158,7 @@ const App = (): React.JSX.Element => {
               <Route
                 path="/ingredients/:id"
                 element={
-                  <Modal
-                    title="Детали ингредиента"
-                    onClose={closeModal}
-                  >
+                  <Modal title="Детали ингредиента" onClose={closeModal}>
                     <IngredientDetails />
                   </Modal>
                 }
@@ -197,10 +167,7 @@ const App = (): React.JSX.Element => {
               <Route
                 path="/feed/:number"
                 element={
-                  <Modal
-                    title="Информация о заказе"
-                    onClose={closeModal}
-                  >
+                  <Modal title="Информация о заказе" onClose={closeModal}>
                     <OrderInfo />
                   </Modal>
                 }
@@ -210,10 +177,7 @@ const App = (): React.JSX.Element => {
                 path="/profile/orders/:number"
                 element={
                   <ProtectedRoute>
-                    <Modal
-                      title="Информация о заказе"
-                      onClose={closeModal}
-                    >
+                    <Modal title="Информация о заказе" onClose={closeModal}>
                       <OrderInfo />
                     </Modal>
                   </ProtectedRoute>

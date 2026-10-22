@@ -1,8 +1,7 @@
-
 import { OrderStatus } from '@components';
 import {
   CurrencyIcon,
-  FormattedDate
+  FormattedDate,
 } from '@krgaa/react-developer-burger-ui-components';
 import { memo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -14,7 +13,7 @@ import styles from './order-card.module.css';
 export const OrderCardUI = memo(function OrderCardUI({
   orderInfo,
   maxIngredients,
-  locationState
+  locationState,
 }: OrderCardUIProps): React.JSX.Element {
   const location = useLocation();
 
@@ -34,9 +33,7 @@ export const OrderCardUI = memo(function OrderCardUI({
         </span>
       </div>
 
-      <h4
-        className={`pt-6 text text_type_main-medium ${styles.order_name}`}
-      >
+      <h4 className={`pt-6 text text_type_main-medium ${styles.order_name}`}>
         {orderInfo.name}
       </h4>
 
@@ -59,33 +56,25 @@ export const OrderCardUI = memo(function OrderCardUI({
                 <img
                   style={{
                     opacity:
-                      orderInfo.remains &&
-                      maxIngredients === index + 1
-                        ? '0.5'
-                        : '1'
+                      orderInfo.remains && maxIngredients === index + 1 ? '0.5' : '1',
                   }}
                   className={styles.img}
                   src={ingredient.image_mobile}
                   alt={ingredient.name}
                 />
 
-                {maxIngredients === index + 1 &&
-                  orderInfo.remains > 0 && (
-                    <span
-                      className={`text text_type_digits-default ${styles.remains}`}
-                    >
-                      +{orderInfo.remains}
-                    </span>
-                  )}
+                {maxIngredients === index + 1 && orderInfo.remains > 0 && (
+                  <span className={`text text_type_digits-default ${styles.remains}`}>
+                    +{orderInfo.remains}
+                  </span>
+                )}
               </li>
             );
           })}
         </ul>
 
         <div>
-          <span
-            className={`text text_type_digits-default pr-1 ${styles.order_total}`}
-          >
+          <span className={`text text_type_digits-default pr-1 ${styles.order_total}`}>
             {orderInfo.total}
           </span>
           <CurrencyIcon type="primary" />

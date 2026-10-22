@@ -1,19 +1,17 @@
-
 import { Preloader, OrderInfoUI } from '@ui';
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import type { TIngredient } from '@utils-types';
-
-import { useDispatch, useSelector } from '../../services/store';
-import { selectIngredients } from '../../services/slices/ingredientsSlice';
 import { selectFeed } from '../../services/slices/feedSlice';
-
+import { selectIngredients } from '../../services/slices/ingredientsSlice';
 import {
   fetchOrderByNumber,
   selectCurrentOrder,
-  selectUserOrders
+  selectUserOrders,
 } from '../../services/slices/ordersSlice';
+import { useDispatch, useSelector } from '../../services/store';
+
+import type { TIngredient } from '@utils-types';
 
 export const OrderInfo = (): React.JSX.Element => {
   const { number } = useParams();
@@ -29,11 +27,9 @@ export const OrderInfo = (): React.JSX.Element => {
 
   const orderNumber = Number(number);
   const isValidNumber =
-    Boolean(number) &&
-    Number.isInteger(orderNumber) &&
-    orderNumber > 0;
+    Boolean(number) && Number.isInteger(orderNumber) && orderNumber > 0;
 
-  useEffect(() => {
+  useEffect((): (() => void) | undefined => {
     let cancelled = false;
 
     setIsFetching(true);
@@ -41,7 +37,7 @@ export const OrderInfo = (): React.JSX.Element => {
 
     if (!isValidNumber) {
       setIsFetching(false);
-      return;
+      return undefined;
     }
 
     void dispatch(fetchOrderByNumber(orderNumber))
@@ -57,12 +53,12 @@ export const OrderInfo = (): React.JSX.Element => {
         }
       });
 
-    return () => {
+    return (): void => {
       cancelled = true;
     };
   }, [dispatch, orderNumber, isValidNumber]);
 
-  const orderData = useMemo(() => {
+  const orderData = useMemo((): typeof currentOrder => {
     if (!isValidNumber) return null;
 
     if (currentOrder?.number === orderNumber) {
@@ -70,36 +66,21 @@ export const OrderInfo = (): React.JSX.Element => {
     }
 
     return (
-      userOrders.find(
-        (order) => order.number === orderNumber
-      ) ||
-      feed.orders.find(
-        (order) => order.number === orderNumber
-      ) ||
+      userOrders.find((order) => order.number === orderNumber) ??
+      feed.orders.find((order) => order.number === orderNumber) ??
       null
     );
-  }, [
-    currentOrder,
-    userOrders,
-    feed.orders,
-    orderNumber,
-    isValidNumber
-  ]);
+  }, [currentOrder, userOrders, feed.orders, orderNumber, isValidNumber]);
 
   const orderInfo = useMemo(() => {
     if (!orderData || !ingredients.length) {
       return null;
     }
 
-    const ingredientsInfo: Record<
-      string,
-      TIngredient & { count: number }
-    > = {};
+    const ingredientsInfo: Record<string, TIngredient & { count: number }> = {};
 
     orderData.ingredients.forEach((id) => {
-      const ingredient = ingredients.find(
-        (item) => item._id === id
-      );
+      const ingredient = ingredients.find((item) => item._id === id);
 
       if (!ingredient) return;
 
@@ -108,7 +89,7 @@ export const OrderInfo = (): React.JSX.Element => {
       } else {
         ingredientsInfo[id] = {
           ...ingredient,
-          count: 1
+          count: 1,
         };
       }
     });
@@ -122,16 +103,12 @@ export const OrderInfo = (): React.JSX.Element => {
       ...orderData,
       ingredientsInfo,
       total,
-      date: new Date(orderData.createdAt)
+      date: new Date(orderData.createdAt),
     };
   }, [orderData, ingredients]);
 
   if (!isValidNumber) {
-    return (
-      <p className="text text_type_main-medium mt-10">
-        Некорректный номер заказа
-      </p>
-    );
+    return <p className="text text_type_main-medium mt-10">Некорректный номер заказа</p>;
   }
 
   if (isFetching) {
@@ -139,19 +116,11 @@ export const OrderInfo = (): React.JSX.Element => {
   }
 
   if (error && !orderInfo) {
-    return (
-      <p className="text text_type_main-medium mt-10">
-        {error}
-      </p>
-    );
+    return <p className="text text_type_main-medium mt-10">{error}</p>;
   }
 
   if (!orderInfo) {
-    return (
-      <p className="text text_type_main-medium mt-10">
-        Заказ не найден
-      </p>
-    );
+    return <p className="text text_type_main-medium mt-10">Заказ не найден</p>;
   }
 
   return <OrderInfoUI orderInfo={orderInfo} />;

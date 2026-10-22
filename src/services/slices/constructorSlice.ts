@@ -1,17 +1,16 @@
-
 import { createSlice, nanoid } from '@reduxjs/toolkit';
-import type { PayloadAction } from '@reduxjs/toolkit';
 
+import type { RootState } from '../store';
+import type { PayloadAction } from '@reduxjs/toolkit';
 import type {
   TIngredient,
   TConstructorIngredient,
-  TConstructorState
+  TConstructorState,
 } from '@utils-types';
-import type { RootState } from '../store';
 
 const initialState: TConstructorState = {
   bun: null,
-  ingredients: []
+  ingredients: [],
 };
 
 const constructorSlice = createSlice({
@@ -19,10 +18,7 @@ const constructorSlice = createSlice({
   initialState,
   reducers: {
     addIngredient: {
-      reducer: (
-        state,
-        action: PayloadAction<TConstructorIngredient>
-      ) => {
+      reducer: (state, action: PayloadAction<TConstructorIngredient>) => {
         if (action.payload.type === 'bun') {
           state.bun = action.payload;
         } else {
@@ -32,18 +28,13 @@ const constructorSlice = createSlice({
       prepare: (ingredient: TIngredient) => ({
         payload: {
           ...ingredient,
-          id: nanoid()
-        }
-      })
+          id: nanoid(),
+        },
+      }),
     },
 
-    removeIngredient: (
-      state,
-      action: PayloadAction<string>
-    ) => {
-      state.ingredients = state.ingredients.filter(
-        (item) => item.id !== action.payload
-      );
+    removeIngredient: (state, action: PayloadAction<string>) => {
+      state.ingredients = state.ingredients.filter((item) => item.id !== action.payload);
     },
 
     moveIngredient: (
@@ -68,18 +59,14 @@ const constructorSlice = createSlice({
       state.ingredients.splice(to, 0, ingredient);
     },
 
-    clearConstructor: () => initialState
-  }
+    clearConstructor: (): TConstructorState => initialState,
+  },
 });
 
-export const {
-  addIngredient,
-  removeIngredient,
-  moveIngredient,
-  clearConstructor
-} = constructorSlice.actions;
+export const { addIngredient, removeIngredient, moveIngredient, clearConstructor } =
+  constructorSlice.actions;
 
-export const selectConstructorItems = (state: RootState) =>
+export const selectConstructorItems = (state: RootState): TConstructorState =>
   state.burgerConstructor;
 
 export default constructorSlice.reducer;

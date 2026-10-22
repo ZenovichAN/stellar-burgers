@@ -1,21 +1,14 @@
-
 import { ProfileUI } from '@ui-pages';
-import {
-  type SyntheticEvent,
-  type ChangeEvent,
-  useEffect,
-  useState
-} from 'react';
-
-import { useDispatch, useSelector } from '../../services/store';
+import { type SyntheticEvent, type ChangeEvent, useEffect, useState } from 'react';
 
 import {
   updateUser,
   clearUserError,
   selectUser,
   selectUpdateUserError,
-  selectIsUpdatingUser
+  selectIsUpdatingUser,
 } from '../../services/slices/userSlice';
+import { useDispatch, useSelector } from '../../services/store';
 
 export const Profile = (): React.JSX.Element => {
   const dispatch = useDispatch();
@@ -25,9 +18,9 @@ export const Profile = (): React.JSX.Element => {
   const isUpdating = useSelector(selectIsUpdatingUser);
 
   const [formValue, setFormValue] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    password: ''
+    name: user?.name ?? '',
+    email: user?.email ?? '',
+    password: '',
   });
 
   useEffect(() => {
@@ -35,24 +28,22 @@ export const Profile = (): React.JSX.Element => {
       setFormValue({
         name: user.name,
         email: user.email,
-        password: ''
+        password: '',
       });
     }
   }, [user]);
 
   const isFormChanged =
-    formValue.name !== (user?.name || '') ||
-    formValue.email !== (user?.email || '') ||
+    formValue.name !== (user?.name ?? '') ||
+    formValue.email !== (user?.email ?? '') ||
     formValue.password.length > 0;
 
-  const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement>
-  ): void => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
 
     setFormValue((previous) => ({
       ...previous,
-      [name]: value
+      [name]: value,
     }));
 
     if (updateUserError) {
@@ -64,9 +55,9 @@ export const Profile = (): React.JSX.Element => {
     e.preventDefault();
 
     setFormValue({
-      name: user?.name || '',
-      email: user?.email || '',
-      password: ''
+      name: user?.name ?? '',
+      email: user?.email ?? '',
+      password: '',
     });
 
     dispatch(clearUserError());
@@ -102,7 +93,7 @@ export const Profile = (): React.JSX.Element => {
         setFormValue({
           name: result.payload.name,
           email: result.payload.email,
-          password: ''
+          password: '',
         });
       }
     });
@@ -112,7 +103,7 @@ export const Profile = (): React.JSX.Element => {
     <ProfileUI
       formValue={formValue}
       isFormChanged={isFormChanged && !isUpdating}
-      updateUserError={updateUserError || undefined}
+      updateUserError={updateUserError ?? undefined}
       handleSubmit={handleSubmit}
       handleCancel={handleCancel}
       handleInputChange={handleInputChange}

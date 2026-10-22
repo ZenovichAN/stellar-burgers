@@ -1,15 +1,15 @@
-
 import { BurgerIngredientUI } from '@ui';
 import { memo } from 'react';
 import { useLocation } from 'react-router-dom';
 
-import type { TBurgerIngredientProps } from './type';
-import { useDispatch } from '../../services/store';
 import { addIngredient } from '../../services/slices/constructorSlice';
+import { useDispatch } from '../../services/store';
+
+import type { TBurgerIngredientProps } from './type';
 
 export const BurgerIngredient = memo(function BurgerIngredient({
   ingredient,
-  count
+  count,
 }: TBurgerIngredientProps): React.JSX.Element {
   const location = useLocation();
   const dispatch = useDispatch();
