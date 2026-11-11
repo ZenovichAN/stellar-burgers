@@ -1,7 +1,4 @@
-
-import ingredientsReducer, {
-  fetchIngredients
-} from './ingredientsSlice';
+import ingredientsReducer, { fetchIngredients } from './ingredientsSlice';
 
 import type { TIngredient } from '@utils-types';
 
@@ -17,7 +14,7 @@ const mockIngredients: TIngredient[] = [
     price: 100,
     image: 'bun.png',
     image_large: 'bun-large.png',
-    image_mobile: 'bun-mobile.png'
+    image_mobile: 'bun-mobile.png',
   },
   {
     _id: 'main-1',
@@ -30,20 +27,20 @@ const mockIngredients: TIngredient[] = [
     price: 200,
     image: 'main.png',
     image_large: 'main-large.png',
-    image_mobile: 'main-mobile.png'
-  }
+    image_mobile: 'main-mobile.png',
+  },
 ];
 
 describe('ingredientsSlice', () => {
   const initialState = {
     items: [],
     isLoading: false,
-    error: null
+    error: null,
   };
 
   test('возвращает начальное состояние при неизвестном экшене', () => {
     const state = ingredientsReducer(undefined, {
-      type: 'UNKNOWN'
+      type: 'UNKNOWN',
     });
 
     expect(state).toEqual(initialState);
@@ -58,7 +55,7 @@ describe('ingredientsSlice', () => {
     expect(state).toEqual({
       items: [],
       isLoading: true,
-      error: null
+      error: null,
     });
   });
 
@@ -66,7 +63,7 @@ describe('ingredientsSlice', () => {
     const previousState = {
       items: [],
       isLoading: false,
-      error: 'Ошибка сервера'
+      error: 'Ошибка сервера',
     };
 
     const state = ingredientsReducer(
@@ -82,21 +79,18 @@ describe('ingredientsSlice', () => {
     const loadingState = {
       items: [],
       isLoading: true,
-      error: null
+      error: null,
     };
 
     const state = ingredientsReducer(
       loadingState,
-      fetchIngredients.fulfilled(
-        mockIngredients,
-        'request-id'
-      )
+      fetchIngredients.fulfilled(mockIngredients, 'request-id')
     );
 
     expect(state).toEqual({
       items: mockIngredients,
       isLoading: false,
-      error: null
+      error: null,
     });
   });
 
@@ -104,36 +98,28 @@ describe('ingredientsSlice', () => {
     const loadingState = {
       items: [],
       isLoading: true,
-      error: null
+      error: null,
     };
 
     const state = ingredientsReducer(
       loadingState,
-      fetchIngredients.rejected(
-        new Error('Ошибка загрузки'),
-        'request-id'
-      )
+      fetchIngredients.rejected(new Error('Ошибка загрузки'), 'request-id')
     );
 
     expect(state).toEqual({
       items: [],
       isLoading: false,
-      error: 'Ошибка загрузки'
+      error: 'Ошибка загрузки',
     });
   });
 
   test('rejected устанавливает стандартное сообщение при отсутствии текста ошибки', () => {
     const state = ingredientsReducer(
       initialState,
-      fetchIngredients.rejected(
-        { name: 'Error' },
-        'request-id'
-      )
+      fetchIngredients.rejected({ name: 'Error' }, 'request-id')
     );
 
-    expect(state.error).toBe(
-      'Ошибка загрузки ингредиентов'
-    );
+    expect(state.error).toBe('Ошибка загрузки ингредиентов');
     expect(state.isLoading).toBe(false);
   });
 });

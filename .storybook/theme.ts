@@ -51,5 +51,5 @@ export const appTheme = create({
   inputTextColor: TEXT_PRIMARY,
   inputBorderRadius: 4,
 
-  brandTitle: 'Stellar Burger'
+  brandTitle: 'Stellar Burger',
 });
