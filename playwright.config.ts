@@ -1,4 +1,3 @@
-
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
@@ -14,20 +13,20 @@ export default defineConfig({
 
   use: {
     baseURL: 'http://127.0.0.1:4000',
-    trace: 'on-first-retry'
+    trace: 'on-first-retry',
   },
 
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] }
-    }
+      use: { ...devices['Desktop Chrome'] },
+    },
   ],
 
   webServer: {
     command: 'npm run start -- --host 127.0.0.1',
     url: 'http://127.0.0.1:4000',
     reuseExistingServer: !process.env.CI,
-    timeout: 120000
-  }
+    timeout: 120000,
+  },
 });
