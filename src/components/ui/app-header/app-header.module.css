@@ -17,11 +17,12 @@
 
 .link {
   display: flex;
+  align-items: center;
   color: var(--text-inactive-color);
   text-decoration: none;
 }
 
-.link_active {
+.active {
   color: var(--text-primary-color);
 }
 

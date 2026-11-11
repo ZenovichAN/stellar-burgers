@@ -1,64 +1,126 @@
 import { Preloader, OrderInfoUI } from '@ui';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
+
+import { selectFeed } from '../../services/slices/feedSlice';
+import { selectIngredients } from '../../services/slices/ingredientsSlice';
+import {
+  fetchOrderByNumber,
+  selectCurrentOrder,
+  selectUserOrders,
+} from '../../services/slices/ordersSlice';
+import { useDispatch, useSelector } from '../../services/store';
 
 import type { TIngredient } from '@utils-types';
 
 export const OrderInfo = (): React.JSX.Element => {
-  /** TODO: взять переменные orderData и ingredients из стора */
-  const orderData = {
-    createdAt: '',
-    ingredients: [],
-    _id: '',
-    status: '',
-    name: '',
-    updatedAt: 'string',
-    number: 0,
-  };
+  const { number } = useParams();
+  const dispatch = useDispatch();
 
-  const ingredients: TIngredient[] = [];
+  const ingredients = useSelector(selectIngredients);
+  const feed = useSelector(selectFeed);
+  const userOrders = useSelector(selectUserOrders);
+  const currentOrder = useSelector(selectCurrentOrder);
 
-  /* Готовим данные для отображения */
-  const orderInfo = useMemo(() => {
-    if (!orderData || !ingredients.length) return null;
+  const [isFetching, setIsFetching] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-    const date = new Date(orderData.createdAt);
+  const orderNumber = Number(number);
+  const isValidNumber =
+    Boolean(number) && Number.isInteger(orderNumber) && orderNumber > 0;
 
-    type TIngredientsWithCount = Record<string, TIngredient & { count: number }>;
+  useEffect((): (() => void) | undefined => {
+    let cancelled = false;
 
-    const ingredientsInfo = orderData.ingredients.reduce(
-      (acc: TIngredientsWithCount, item) => {
-        if (!acc[item]) {
-          const ingredient = ingredients.find((ing) => ing._id === item);
-          if (ingredient) {
-            acc[item] = {
-              ...ingredient,
-              count: 1,
-            };
-          }
-        } else {
-          acc[item].count++;
+    setIsFetching(true);
+    setError(null);
+
+    if (!isValidNumber) {
+      setIsFetching(false);
+      return undefined;
+    }
+
+    void dispatch(fetchOrderByNumber(orderNumber))
+      .unwrap()
+      .catch(() => {
+        if (!cancelled) {
+          setError('Не удалось загрузить заказ');
         }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setIsFetching(false);
+        }
+      });
 
-        return acc;
-      },
-      {}
+    return (): void => {
+      cancelled = true;
+    };
+  }, [dispatch, orderNumber, isValidNumber]);
+
+  const orderData = useMemo((): typeof currentOrder => {
+    if (!isValidNumber) return null;
+
+    if (currentOrder?.number === orderNumber) {
+      return currentOrder;
+    }
+
+    return (
+      userOrders.find((order) => order.number === orderNumber) ??
+      feed.orders.find((order) => order.number === orderNumber) ??
+      null
     );
+  }, [currentOrder, userOrders, feed.orders, orderNumber, isValidNumber]);
+
+  const orderInfo = useMemo(() => {
+    if (!orderData || !ingredients.length) {
+      return null;
+    }
+
+    const ingredientsInfo: Record<string, TIngredient & { count: number }> = {};
+
+    orderData.ingredients.forEach((id) => {
+      const ingredient = ingredients.find((item) => item._id === id);
+
+      if (!ingredient) return;
+
+      if (ingredientsInfo[id]) {
+        ingredientsInfo[id].count++;
+      } else {
+        ingredientsInfo[id] = {
+          ...ingredient,
+          count: 1,
+        };
+      }
+    });
 
     const total = Object.values(ingredientsInfo).reduce(
-      (acc, item) => acc + item.price * item.count,
+      (sum, item) => sum + item.price * item.count,
       0
     );
 
     return {
       ...orderData,
       ingredientsInfo,
-      date,
       total,
+      date: new Date(orderData.createdAt),
     };
   }, [orderData, ingredients]);
 
-  if (!orderInfo) {
+  if (!isValidNumber) {
+    return <p className="text text_type_main-medium mt-10">Некорректный номер заказа</p>;
+  }
+
+  if (isFetching) {
     return <Preloader />;
+  }
+
+  if (error && !orderInfo) {
+    return <p className="text text_type_main-medium mt-10">{error}</p>;
+  }
+
+  if (!orderInfo) {
+    return <p className="text text_type_main-medium mt-10">Заказ не найден</p>;
   }
 
   return <OrderInfoUI orderInfo={orderInfo} />;
