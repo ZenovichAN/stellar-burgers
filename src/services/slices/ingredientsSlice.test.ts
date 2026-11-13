@@ -114,10 +114,12 @@ describe('ingredientsSlice', () => {
   });
 
   test('rejected устанавливает стандартное сообщение при отсутствии текста ошибки', () => {
-    const state = ingredientsReducer(
-      initialState,
-      fetchIngredients.rejected({ name: 'Error' }, 'request-id')
-    );
+    const rejectedAction = fetchIngredients.rejected(new Error(), 'request-id');
+
+    // Имитируем отсутствие сообщения в отклоненном экшене
+    rejectedAction.error.message = undefined;
+
+    const state = ingredientsReducer(initialState, rejectedAction);
 
     expect(state.error).toBe('Ошибка загрузки ингредиентов');
     expect(state.isLoading).toBe(false);

@@ -41,27 +41,41 @@ test.describe('Конструктор бургера', () => {
   test('Добавление булки и начинки', async ({ page }) => {
     await page.goto('/');
 
+    const constructor = page.getByTestId('burger-constructor');
+
+    const topBun = constructor.getByText(`${BUN} (верх)`);
+    const bottomBun = constructor.getByText(`${BUN} (низ)`);
+    const filling = constructor.locator('li').filter({
+      hasText: FILLING,
+    });
+
+    await expect(topBun).toHaveCount(0);
+    await expect(bottomBun).toHaveCount(0);
+
     await addIngredient(page, BUN);
 
-    await expect(page.getByText(`${BUN} (верх)`)).toBeVisible();
+    await expect(topBun).toBeVisible();
+    await expect(bottomBun).toBeVisible();
 
-    await expect(page.getByText(`${BUN} (низ)`)).toBeVisible();
+    await expect(filling).toHaveCount(0);
 
     await addIngredient(page, FILLING);
 
-    await expect(
-      page.locator('li').filter({
-        hasText: FILLING,
-      })
-    ).toHaveCount(2);
+    await expect(filling).toHaveCount(1);
   });
 
   test('Открытие и закрытие модального окна ингредиента', async ({ page }) => {
     await page.goto('/');
 
-    await ingredientCard(page, BUN).getByText(BUN, { exact: true }).click();
-
     const modal = page.locator('#modals');
+
+    await expect(
+      modal.getByRole('heading', {
+        name: 'Детали ингредиента',
+      })
+    ).toHaveCount(0);
+
+    await ingredientCard(page, BUN).getByText(BUN, { exact: true }).click();
 
     await expect(
       modal.getByRole('heading', {
@@ -107,10 +121,26 @@ test.describe('Конструктор бургера', () => {
 
     await page.goto('/');
 
+    const constructor = page.getByTestId('burger-constructor');
+    const modal = page.locator('#modals');
+
     await expect(page.getByText(BUN, { exact: true })).toBeVisible();
 
     await addIngredient(page, BUN);
     await addIngredient(page, FILLING);
+
+    // Перед оформлением заказа конструктор заполнен
+    await expect(constructor.getByText(`${BUN} (верх)`)).toBeVisible();
+    await expect(constructor.getByText(`${BUN} (низ)`)).toBeVisible();
+
+    await expect(constructor.locator('li').filter({ hasText: FILLING })).toHaveCount(1);
+
+    // Модального окна с номером заказа еще нет
+    await expect(
+      modal.getByRole('heading', {
+        name: String(ORDER_NUMBER),
+      })
+    ).toHaveCount(0);
 
     const orderRequestPromise = page.waitForRequest(
       (request) => request.url().endsWith('/api/orders') && request.method() === 'POST'
@@ -128,16 +158,14 @@ test.describe('Конструктор бургера', () => {
       ingredients: ['test-bun-001', 'test-main-002', 'test-bun-001'],
     });
 
-    const modal = page.locator('#modals');
-
     await expect(
       modal.getByRole('heading', {
         name: String(ORDER_NUMBER),
       })
     ).toBeVisible();
 
+    // После оформления заказа конструктор очищен
     await expect(page.getByText('Выберите булки').first()).toBeVisible();
-
     await expect(page.getByText('Выберите начинку')).toBeVisible();
 
     await modal.getByRole('button', { name: 'Закрыть' }).click();

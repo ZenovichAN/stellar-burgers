@@ -25,26 +25,21 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
 
   return {
-    plugins: [
-      checker({
-        typescript: { tsconfigPath: 'tsconfig.app.json' },
-      }),
-      react(),
-      sassDts({
-        enabledMode: ['development'],
-        esmExport: true,
-      }),
-      tsconfigPaths(),
-    ],
+    plugins: [checker({
+      typescript: { tsconfigPath: 'tsconfig.app.json' }
+    }), react(), sassDts({
+      enabledMode: ['development'],
+      esmExport: true
+    }), tsconfigPaths()],
     base: '',
     css: {
-      modules: { generateScopedName },
+      modules: { generateScopedName }
     },
     define: {
-      'process.env.BURGER_API_URL': JSON.stringify(env.BURGER_API_URL ?? ''),
+      'process.env.BURGER_API_URL': JSON.stringify(env.BURGER_API_URL ?? '')
     },
     server: {
-      open: true,
+      open: true
     },
   };
 });
